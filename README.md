@@ -1,5 +1,4 @@
 <h1 align=center>🐍 SnakeType ⌨</h1>
-<hr>
 <p align=center>A typing-test project I made for learning Python <b>(again)</b>
 
 ## TODO:
