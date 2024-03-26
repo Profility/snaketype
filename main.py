@@ -1,34 +1,38 @@
 import curses
+import time
+import math
 import random
 import json
-
-# TODO:
-# Remove delay for the cursor when pressing backspace
-# Add support for multiple y-lines, word wrapping
-# Add wpm and time elapsed
-# Add random words /
 
 def getWords():
     with open('wordlist.json', 'r') as list:
         return str(' '.join(random.sample(json.load(list), 15)))
 
 def main(screen):
+
+    # Setup
     curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK) # Correct
     curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED) # Wrong
-    curses.curs_set(0) # Disable cursor
+
+    curses.curs_set(0)
 
     wordText = getWords()
-    wrongFlag = False
     typedText = []
+    startTime = time.time()
 
     screen.keypad(True)
     screen.clear()
+
     screen.addstr(wordText)
     screen.refresh()
 
+    # WPM Loop
     while True:
+        elapsedTime = math.floor(max(time.time() - startTime, 1))
+        wordsPerMinute = round(len(typedText) / (elapsedTime / 60) / 5)
+
         if ''.join(typedText) == wordText: # Break when typedtext is equal to wordtext
-            print('Finished!')
+            print(f'Finished!\nElapsed Time: {elapsedTime}s\nWPM: {wordsPerMinute}')
             break
 
         key = screen.getch()
@@ -50,13 +54,11 @@ def main(screen):
             for i, c in enumerate(typedText):
                 textColor = curses.color_pair(1)
                 if c != wordText[i]: # If typed character doesn't match target
-                    wrongFlag = True
                     textColor = curses.color_pair(2)
-                elif wrongFlag == False: # If typed character matches target
+                else: # If typed character matches target
                     textColor = curses.color_pair(1)
 
                 screen.addstr(0, i, wordText[i], textColor) # Print characters with appropriate color
-                #screen.addstr(2, 0, f"Typed: {''.join(typedText)}")
         
         # If BACKSPACE is pressed
         elif key == 8:
