@@ -3,7 +3,7 @@ import time
 import math
 import random
 
-wordAmount = 20
+wordAmount = 30
 
 def getWords():
     with open("words.txt", "r") as words:
@@ -36,7 +36,6 @@ def main(screen):
     while True:
         screenyx = screen.getmaxyx()
 
-        print(f"s{screen.getmaxyx()[1]} | t{textx}")
         elapsedTime = math.floor(max(time.time() - startTime, 1))
         wordsPerMinute = round(len(typedText) / (elapsedTime / 60) / 5)
 
@@ -62,13 +61,13 @@ def main(screen):
 
             # Compare typed text with target text
             for i, c in enumerate(typedText):
-                print(f"i{i}")
                 textColor = curses.color_pair(1)
                 if c != wordText[i]: # If typed character doesn't match target
                     textColor = curses.color_pair(2)
                 else: # If typed character matches target
                     textColor = curses.color_pair(1)
 
+            # If end of line is reached, go to next line
             if textx >= screenyx[1]:
                 texty = texty + 1
                 textx = 0
