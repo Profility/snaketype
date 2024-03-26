@@ -2,11 +2,14 @@ import curses
 import time
 import math
 import random
-import json
+
+wordAmount = 20
 
 def getWords():
-    with open('wordlist.json', 'r') as list:
-        return str(' '.join(random.sample(json.load(list), 15)))
+    with open("words.txt", "r") as words:
+        lines = words.readlines()
+        wordlist = [line.strip() for line in lines]
+        return str(' '.join(random.sample(wordlist, wordAmount)))
 
 def main(screen):
 
@@ -23,16 +26,23 @@ def main(screen):
     screen.keypad(True)
     screen.clear()
 
+    textx = 0
+    texty = 0
+
     screen.addstr(wordText)
     screen.refresh()
 
     # WPM Loop
     while True:
+        screenyx = screen.getmaxyx()
+
+        print(f"s{screen.getmaxyx()[1]} | t{textx}")
         elapsedTime = math.floor(max(time.time() - startTime, 1))
         wordsPerMinute = round(len(typedText) / (elapsedTime / 60) / 5)
 
-        if ''.join(typedText) == wordText: # Break when typedtext is equal to wordtext
-            print(f'Finished!\nElapsed Time: {elapsedTime}s\nWPM: {wordsPerMinute}')
+        # When finished
+        if ''.join(typedText) == wordText: 
+            print(f"you finished typing!\n\ntime: {elapsedTime}\nwpm: {wordsPerMinute}")
             break
 
         key = screen.getch()
@@ -52,21 +62,27 @@ def main(screen):
 
             # Compare typed text with target text
             for i, c in enumerate(typedText):
+                print(f"i{i}")
                 textColor = curses.color_pair(1)
                 if c != wordText[i]: # If typed character doesn't match target
                     textColor = curses.color_pair(2)
                 else: # If typed character matches target
                     textColor = curses.color_pair(1)
 
-                screen.addstr(0, i, wordText[i], textColor) # Print characters with appropriate color
+            if textx >= screenyx[1]:
+                texty = texty + 1
+                textx = 0
+                
+            screen.addstr(texty, textx, chr(key), textColor) # Print characters with appropriate color
+            textx = textx + 1
         
         # If BACKSPACE is pressed
         elif key == 8:
             if len(typedText) > 0:
                 length = len(typedText) - 1
                 typedText.pop()
-                screen.move(0, length)
-                screen.addstr(0, len(typedText), wordText[len(typedText)])
+                screen.move(texty, length)
+                screen.addstr(texty, len(typedText), wordText[len(typedText)])
 
         screen.refresh()
             
