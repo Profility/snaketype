@@ -7,3 +7,4 @@
 - [x] Add random words
 - [ ] Fix removing words using BACKSPACE
 - [ ] Optimize and clean code
+- [ ] Argument/Options Parsing
