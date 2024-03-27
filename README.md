@@ -5,6 +5,6 @@
 - [x] Add support for multiple y-lines, word wrapping
 - [x] Add wpm and time elapsed
 - [x] Add random words
-- [ ] Fix removing words using BACKSPACE
+- [x] Fix removing words using BACKSPACE
 - [ ] Optimize and clean code
-- [ ] Argument/Options Parsing
+- [x] Argument/Options Parsing

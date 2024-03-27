@@ -2,14 +2,15 @@ import curses
 import time
 import math
 import random
+import args
 
-wordAmount = 30
+arguments = args.parse_arguments()
 
 def getWords():
-    with open("words.txt", "r") as words:
+    with open(f"words.txt", "r") as words:
         lines = words.readlines()
         wordlist = [line.strip() for line in lines]
-        return str(' '.join(random.sample(wordlist, wordAmount)))
+        return str(' '.join(random.sample(wordlist, arguments.amount)))
 
 def main(screen):
 
@@ -19,22 +20,20 @@ def main(screen):
 
     curses.curs_set(0)
 
-    wordText = getWords()
     typedText = []
+    texty, textx = 0, 0
+    wordText = getWords()
     startTime = time.time()
 
     screen.keypad(True)
     screen.clear()
-
-    textx = 0
-    texty = 0
 
     screen.addstr(wordText)
     screen.refresh()
 
     # WPM Loop
     while True:
-        screenyx = screen.getmaxyx()
+        maxyx = screen.getmaxyx()
 
         elapsedTime = math.floor(max(time.time() - startTime, 1))
         wordsPerMinute = round(len(typedText) / (elapsedTime / 60) / 5)
@@ -47,7 +46,7 @@ def main(screen):
         key = screen.getch()
 
         # If CTRL+Q pressed
-        if key == 17 or key == 27:
+        if key == 17 or key == 27 or key == 3:
             break
 
         # Handling resizing
@@ -68,20 +67,19 @@ def main(screen):
                     textColor = curses.color_pair(1)
 
             # If end of line is reached, go to next line
-            if textx >= screenyx[1]:
+            if textx >= maxyx[1]:
                 texty = texty + 1
                 textx = 0
                 
-            screen.addstr(texty, textx, chr(key), textColor) # Print characters with appropriate color
+            screen.addstr(texty, textx, wordText[i], textColor) # Print characters with appropriate color
             textx = textx + 1
         
         # If BACKSPACE is pressed
         elif key == 8:
             if len(typedText) > 0:
-                length = len(typedText) - 1
                 typedText.pop()
-                screen.move(texty, length)
-                screen.addstr(texty, len(typedText), wordText[len(typedText)])
+                screen.addstr(texty, textx-1, wordText[len(typedText)])
+                textx = textx - 1
 
         screen.refresh()
             
