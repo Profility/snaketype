@@ -11,5 +11,4 @@ This project was made for the purpose of re-learning Python.
 - [x] Add random words
 - [x] Fix removing words using BACKSPACE
 - [x] Argument/Options Parsing
-- [ ] Publish onto PyPi as a package
 - [ ] Fix calculating WPM
