@@ -2,9 +2,35 @@ import curses
 import time
 import math
 import random
-import args
+import argparse
 
-arguments = args.parse_arguments()
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        prog="SnakeType",
+        description="All snaketype command-line arguments"
+    )
+
+    parser.add_argument(
+        "-a",
+        "--amount",
+        metavar="AMOUNT OF WORDS",
+        default=25,
+        type=int,
+        help="Amount of words to type"
+    )
+
+    parser.add_argument(
+        "-f",
+        "--filename",
+        metavar="FILENAME",
+        default="words.txt",
+        type=str,
+        help="Name of the wordlist file"
+    )
+
+    return parser.parse_args()
+
+arguments = parse_arguments()
 
 def getWords():
     with open(f"words.txt", "r") as words:
@@ -21,14 +47,14 @@ def main(screen):
     curses.curs_set(0)
 
     typedText = []
-    texty, textx = 0, 0
+    texty, textx = 1, 0
     wordText = getWords()
     startTime = time.time()
 
     screen.keypad(True)
     screen.clear()
 
-    screen.addstr(wordText)
+    screen.addstr(texty, textx, wordText)
     screen.refresh()
 
     # WPM Loop
@@ -37,6 +63,8 @@ def main(screen):
 
         elapsedTime = math.floor(max(time.time() - startTime, 1))
         wordsPerMinute = round(len(typedText) / (elapsedTime / 60) / 5)
+
+        screen.addstr(0,0, f"Elapsed Time: {elapsedTime} | WPM: {wordsPerMinute}")
 
         # When finished
         if ''.join(typedText) == wordText: 
