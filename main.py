@@ -30,13 +30,11 @@ def parse_arguments():
 
     return parser.parse_args()
 
-arguments = parse_arguments()
-
 def getWords():
     with open(f"words.txt", "r") as words:
         lines = words.readlines()
         wordlist = [line.strip() for line in lines]
-        return str(' '.join(random.sample(wordlist, arguments.amount)))
+        return str(' '.join(random.sample(wordlist, parse_arguments().amount)))
 
 def main(screen):
 
