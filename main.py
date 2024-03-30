@@ -11,15 +11,6 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "-a",
-        "--amount",
-        metavar="AMOUNT OF WORDS",
-        default=25,
-        type=int,
-        help="Amount of words to type"
-    )
-
-    parser.add_argument(
         "-f",
         "--filename",
         metavar="FILENAME",
@@ -28,14 +19,37 @@ def parse_arguments():
         help="Name of the wordlist file"
     )
 
+    parser.add_argument(
+        "-a",
+        "--amount",
+        metavar="AMOUNT OF WORDS",
+        type=int,
+        help="Amount of words to type"
+    )
+
     return parser.parse_args()
 
 def getWords():
-    with open(f"words.txt", "r") as words:
-        lines = words.readlines()
-        wordlist = [line.strip() for line in lines]
-        return str(' '.join(random.sample(wordlist, parse_arguments().amount)))
+    args = parse_arguments()
+    try:
+        with open(args.filename, "r") as words:
+            lines = words.readlines()
+            wordlist = [line.strip() for line in lines]
 
+            if not args.amount: args.amount = len(wordlist)
+            return str(' '.join(random.sample(wordlist, args.amount)))
+    except Exception as e:
+        return f"Failed to get words: {e}"
+    
+def compareCharacters(typedChar, targetChar):
+    textColor = curses.color_pair(1)
+    if typedChar != targetChar: # If typed character doesn't match target
+        textColor = curses.color_pair(2)
+    else: # If typed character matches target
+        textColor = curses.color_pair(1)
+
+    return textColor
+    
 def main(screen):
 
     # Setup
@@ -84,20 +98,15 @@ def main(screen):
         elif key != 8:
             typedText.append(chr(key))
 
-            # Compare typed text with target text
-            for i, c in enumerate(typedText):
-                textColor = curses.color_pair(1)
-                if c != wordText[i]: # If typed character doesn't match target
-                    textColor = curses.color_pair(2)
-                else: # If typed character matches target
-                    textColor = curses.color_pair(1)
-
             # If end of line is reached, go to next line
             if textx >= maxyx[1]:
                 texty = texty + 1
                 textx = 0
-                
-            screen.addstr(texty, textx, wordText[i], textColor) # Print characters with appropriate color
+
+            # Compare typed text with target text
+            for i, c in enumerate(typedText):
+                screen.addstr(texty, textx, wordText[i], compareCharacters(c, wordText[i])) # Print characters with appropriate color
+
             textx = textx + 1
         
         # If BACKSPACE is pressed
