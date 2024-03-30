@@ -4,10 +4,10 @@ import math
 import random
 import argparse
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        prog="SnakeType",
-        description="All snaketype command-line arguments"
+        prog="SnakeType", description="All snaketype command-line arguments"
     )
 
     parser.add_argument(
@@ -16,7 +16,7 @@ def parse_arguments():
         metavar="FILENAME",
         default="words.txt",
         type=str,
-        help="Name of the wordlist file"
+        help="Name of the wordlist file",
     )
 
     parser.add_argument(
@@ -24,10 +24,11 @@ def parse_arguments():
         "--amount",
         metavar="AMOUNT OF WORDS",
         type=int,
-        help="Amount of words to type"
+        help="Amount of words to type",
     )
 
     return parser.parse_args()
+
 
 def getWords():
     args = parse_arguments()
@@ -36,25 +37,29 @@ def getWords():
             lines = words.readlines()
             wordlist = [line.strip() for line in lines]
 
-            if not args.amount: args.amount = len(wordlist)
-            return str(' '.join(random.sample(wordlist, args.amount)))
+            if not args.amount:
+                args.amount = len(wordlist)
+
+            return str(" ".join(random.sample(wordlist, args.amount)))
     except Exception as e:
         return f"Failed to get words: {e}"
-    
+
+
 def compareCharacters(typedChar, targetChar):
     textColor = curses.color_pair(1)
-    if typedChar != targetChar: # If typed character doesn't match target
+    if typedChar != targetChar:  # If typed character doesn't match target
         textColor = curses.color_pair(2)
-    else: # If typed character matches target
+    else:  # If typed character matches target
         textColor = curses.color_pair(1)
 
     return textColor
-    
+
+
 def main(screen):
 
     # Setup
-    curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK) # Correct
-    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED) # Wrong
+    curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # Correct
+    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED)  # Wrong
 
     curses.curs_set(0)
 
@@ -76,10 +81,10 @@ def main(screen):
         elapsedTime = math.floor(max(time.time() - startTime, 1))
         wordsPerMinute = round(len(typedText) / (elapsedTime / 60) / 5)
 
-        screen.addstr(0,0, f"Elapsed Time: {elapsedTime} | WPM: {wordsPerMinute}")
+        screen.addstr(0, 0, f"Elapsed Time: {elapsedTime} | WPM: {wordsPerMinute}")
 
         # When finished
-        if ''.join(typedText) == wordText: 
+        if "".join(typedText) == wordText:
             print(f"you finished typing!\n\ntime: {elapsedTime}\nwpm: {wordsPerMinute}")
             break
 
@@ -105,17 +110,20 @@ def main(screen):
 
             # Compare typed text with target text
             for i, c in enumerate(typedText):
-                screen.addstr(texty, textx, wordText[i], compareCharacters(c, wordText[i])) # Print characters with appropriate color
+                screen.addstr(
+                    texty, textx, wordText[i], compareCharacters(c, wordText[i])
+                )  # Print characters with appropriate color
 
             textx = textx + 1
-        
+
         # If BACKSPACE is pressed
         elif key == 8:
             if len(typedText) > 0:
                 typedText.pop()
-                screen.addstr(texty, textx-1, wordText[len(typedText)])
+                screen.addstr(texty, textx - 1, wordText[len(typedText)])
                 textx = textx - 1
 
         screen.refresh()
-            
+
+
 curses.wrapper(main)
