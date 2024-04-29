@@ -3,7 +3,7 @@
 
 **SnakeType** is a simple program to test your typing-speed on your terminal.
 
-This project was made for the purpose of re-learning Python.
+Make sure you have windows-curses installed, you can do so by running: `pip install windows-curses`
 
 ## Usage:
 ```
